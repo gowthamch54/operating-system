@@ -1,0 +1,87 @@
+#include <stdio.h>
+
+int main() {
+    int memorySize, processSize, choice;
+    int memory[20], process[20];
+
+    // Input number of memory partitions
+    printf("Enter number of memory partitions: ");
+    scanf("%d", &memorySize);
+
+    // Input number of processes
+    printf("Enter number of processes: ");
+    scanf("%d", &processSize);
+
+    // Input sizes of memory partitions
+    printf("Enter the size of memory partitions:\n");
+    for (int i = 0; i < memorySize; i++) {
+        scanf("%d", &memory[i]);
+    }
+
+    // Input sizes of processes
+    printf("Enter the size of processes:\n");
+    for (int i = 0; i < processSize; i++) {
+        scanf("%d", &process[i]);
+    }
+
+    // Choose allocation strategy
+    printf("Choose allocation strategy:\n1. First Fit\n2. Best Fit\n3. Worst Fit\nEnter your choice: ");
+    scanf("%d", &choice);
+
+    if (choice == 1) {
+        // First Fit
+        for (int i = 0; i < processSize; i++) {
+            for (int j = 0; j < memorySize; j++) {
+                if (memory[j] >= process[i]) {
+                    printf("\nProcess %d of size %d fits in memory partition %d of size %d", i + 1, process[i], j + 1, memory[j]);
+                    memory[j] -= process[i];
+                    break;
+                }
+            }
+        }
+    } else if (choice == 2) {
+        // Best Fit
+        for (int i = 0; i < processSize; i++) {
+            int bestIndex = -1;
+            for (int j = 0; j < memorySize; j++) {
+                if (memory[j] >= process[i]) {
+                    if (bestIndex == -1 || memory[j] < memory[bestIndex]) {
+                        bestIndex = j;
+                    }
+                }
+            }
+            if (bestIndex != -1) {
+                printf("\nProcess %d of size %d fits in memory partition %d of size %d", i + 1, process[i], bestIndex + 1, memory[bestIndex]);
+                memory[bestIndex] -= process[i];
+            } else {
+                printf("\nProcess %d of size %d must wait", i + 1, process[i]);
+            }
+        }
+    } else if (choice == 3) {
+        // Worst Fit
+        // Sort memory partitions in descending order
+        for (int i = 0; i < memorySize; i++) {
+            for (int j = i + 1; j < memorySize; j++) {
+                if (memory[i] < memory[j]) {
+                    int temp = memory[i];
+                    memory[i] = memory[j];
+                    memory[j] = temp;
+                }
+            }
+        }
+        // Apply First Fit logic on sorted memory
+        for (int i = 0; i < processSize; i++) {
+            for (int j = 0; j < memorySize; j++) {
+                if (memory[j] >= process[i]) {
+                    printf("\nProcess %d of size %d fits in memory partition %d of size %d", i + 1, process[i], j + 1, memory[j]);
+                    memory[j] -= process[i];
+                    break;
+                }
+            }
+        }
+    } else {
+        printf("Invalid choice");
+    }
+
+    return 0;
+}
