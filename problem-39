@@ -1,0 +1,67 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <math.h>
+
+int main() {
+    int n, head, seek_time = 0;
+    
+    // Input number of disk requests
+    printf("Enter the number of disk requests: ");
+    scanf("%d", &n);
+    
+    // Input disk request queue
+    int request_queue[n];
+    printf("Enter the disk request queue:\n");
+    for (int i = 0; i < n; i++) {
+        scanf("%d", &request_queue[i]);
+    }
+    
+    // Input initial position of the disk head
+    printf("Enter the initial position of the disk head: ");
+    scanf("%d", &head);
+    
+    // Sort the request queue for simplicity
+    for (int i = 0; i < n - 1; i++) {
+        for (int j = i + 1; j < n; j++) {
+            if (request_queue[i] > request_queue[j]) {
+                int temp = request_queue[i];
+                request_queue[i] = request_queue[j];
+                request_queue[j] = temp;
+            }
+        }
+    }
+    
+    // C-SCAN Scheduling
+    printf("\nC-SCAN Disk Scheduling:\n");
+    int start = 0;
+    int end = n - 1;
+
+    while (start <= end) {
+        for (int i = start; i <= end; i++) {
+            if (request_queue[i] >= head) {
+                seek_time += abs(head - request_queue[i]);
+                head = request_queue[i];
+                start = i + 1;
+            }
+        }
+        
+        // Move the head to the start (simulate moving to the end and wrapping around)
+        seek_time += abs(head - 0);
+        head = 0;
+        
+        // Continue serving the remaining requests
+        for (int i = 0; i <= end; i++) {
+            if (request_queue[i] > head) {
+                seek_time += abs(head - request_queue[i]);
+                head = request_queue[i];
+            }
+        }
+        break;
+    }
+    
+    // Calculate total and average seek time
+    printf("Total Seek Time: %d\n", seek_time);
+    printf("Average Seek Time: %.2f\n", (float)seek_time / n);
+
+    return 0;
+}
