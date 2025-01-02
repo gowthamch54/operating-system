@@ -1,0 +1,85 @@
+User Types
+Owner (User): The user who owns the file.
+
+Group: A set of users who share the same group.
+
+Others: All other users who are not the owner or part of the group.
+
+File Access Permissions
+Permissions are typically represented using a combination of three attributes:
+
+Read (r): Permission to read the contents of the file.
+
+Write (w): Permission to modify the contents of the file.
+
+Execute (x): Permission to execute the file (if it's a script or a program).
+
+Representation
+Permissions are displayed in a format like -rwxr-xr--, which is divided into three groups of three characters each:
+
+Owner permissions (rwx): Read, write, and execute permissions for the owner.
+
+Group permissions (r-x): Read and execute permissions for the group.
+
+Others permissions (r--): Read permission for others.
+
+Example
+Let's look at an example of file permissions:
+
+shell
+-rwxr-xr--
+-: File type (dash means a regular file)
+
+rwx: Owner can read, write, and execute
+
+r-x: Group can read and execute, but not write
+
+r--: Others can only read
+
+Commands to View and Set Permissions
+ls -l: Lists files with their permissions.
+
+chmod: Changes the file permissions.
+
+Example: chmod 755 filename
+
+Sets permissions to rwxr-xr-x
+
+chown: Changes the file owner.
+
+Example: chown user filename
+
+chgrp: Changes the file group.
+
+Example: chgrp group filename
+
+Example Commands
+Viewing Permissions
+
+shell
+
+ls -l
+Output:
+
+-rwxr-xr--  1 user group 1234 Jan  1 00:00 filename
+Setting Permissions
+
+shell
+
+chmod 755 filename
+This sets the permissions to rwxr-xr-x:
+
+Owner: Read, write, execute
+
+Group: Read, execute
+
+Others: Read
+
+Changing File Owner
+
+shel
+chown newuser filename
+Changing File Group
+
+shell
+chgrp newgroup filename
