@@ -1,0 +1,89 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+typedef struct {
+    int id;
+    char name[30];
+    float salary;
+} Employee;
+
+void addEmployee(FILE *fp) {
+    Employee emp;
+    printf("Enter Employee ID: ");
+    scanf("%d", &emp.id);
+    printf("Enter Employee Name: ");
+    scanf("%s", emp.name);
+    printf("Enter Employee Salary: ");
+    scanf("%f", &emp.salary);
+
+    fseek(fp, 0, SEEK_END);
+    fwrite(&emp, sizeof(Employee), 1, fp);
+}
+
+void displayEmployees(FILE *fp) {
+    Employee emp;
+    fseek(fp, 0, SEEK_SET);
+
+    while (fread(&emp, sizeof(Employee), 1, fp) == 1) {
+        printf("ID: %d, Name: %s, Salary: %.2f\n", emp.id, emp.name, emp.salary);
+    }
+}
+
+void updateEmployeeSalary(FILE *fp, int id, float newSalary) {
+    Employee emp;
+    fseek(fp, 0, SEEK_SET);
+
+    while (fread(&emp, sizeof(Employee), 1, fp) == 1) {
+        if (emp.id == id) {
+            emp.salary = newSalary;
+            fseek(fp, -sizeof(Employee), SEEK_CUR);
+            fwrite(&emp, sizeof(Employee), 1, fp);
+            break;
+        }
+    }
+}
+
+int main() {
+    FILE *fp = fopen("employees.dat", "rb+");
+    if (fp == NULL) {
+        fp = fopen("employees.dat", "wb+");
+        if (fp == NULL) {
+            perror("Unable to open file");
+            return 1;
+        }
+    }
+
+    int choice;
+    do {
+        printf("\n1. Add Employee\n2. Display Employees\n3. Update Employee Salary\n4. Exit\nEnter your choice: ");
+        scanf("%d", &choice);
+
+        switch (choice) {
+            case 1:
+                addEmployee(fp);
+                break;
+            case 2:
+                displayEmployees(fp);
+                break;
+            case 3: {
+                int id;
+                float newSalary;
+                printf("Enter Employee ID to update salary: ");
+                scanf("%d", &id);
+                printf("Enter new Salary: ");
+                scanf("%f", &newSalary);
+                updateEmployeeSalary(fp, id, newSalary);
+                break;
+            }
+            case 4:
+                fclose(fp);
+                printf("Exiting...\n");
+                break;
+            default:
+                printf("Invalid choice! Please try again.\n");
+        }
+    } while (choice != 4);
+
+    return 0;
+}
