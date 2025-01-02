@@ -1,0 +1,41 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+typedef struct {
+    int id;
+    char data[256];
+} Record;
+
+void addRecord(FILE *file, int id, const char *data) {
+    Record record;
+    record.id = id;
+    strcpy(record.data, data);
+    fwrite(&record, sizeof(Record), 1, file);
+}
+
+void readRecords(FILE *file) {
+    Record record;
+    rewind(file);
+
+    while (fread(&record, sizeof(Record), 1, file) == 1) {
+        printf("ID: %d, Data: %s\n", record.id, record.data);
+    }
+}
+
+int main() {
+    FILE *file = fopen("sequential.dat", "wb+");
+    if (!file) {
+        perror("fopen");
+        return 1;
+    }
+
+    addRecord(file, 1, "First record");
+    addRecord(file, 2, "Second record");
+    addRecord(file, 3, "Third record");
+
+    readRecords(file);
+
+    fclose(file);
+    return 0;
+}
