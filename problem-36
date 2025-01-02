@@ -1,0 +1,43 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+typedef struct Block {
+    int data;
+    struct Block *next;
+} Block;
+
+Block* createBlock(int data) {
+    Block *newBlock = (Block*)malloc(sizeof(Block));
+    newBlock->data = data;
+    newBlock->next = NULL;
+    return newBlock;
+}
+
+void addBlock(Block **head, int data) {
+    Block *newBlock = createBlock(data);
+    Block *temp = *head;
+
+    if (*head == NULL) {
+        *head = newBlock;
+        return;
+    }
+
+    while (temp->next != NULL) {
+        temp = temp->next;
+    }
+    temp->next = newBlock;
+}
+
+void readBlocks(Block *head) {
+    Block *temp = head;
+    while (temp != NULL) {
+        printf("Block data: %d\n", temp->data);
+        temp = temp->next;
+    }
+}
+
+int main() {
+    Block *head = NULL;
+
+    addBlock[_{{{CITATION{{{_1{](https://github.com/sunny2028/DS-IN-CPP/tree/7f888d119531cc0e5a75a2601772c12c66c51ea8/Data%20Structure%20practice%2Fqueue%2FProgram%20for%20Page%20Replacement%20Algorithms%20FIFO.cpp)
