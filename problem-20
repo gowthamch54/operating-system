@@ -1,0 +1,69 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <pthread.h>
+#include <semaphore.h>
+#include <unistd.h>
+
+sem_t rw_mutex; // Semaphore for reader-writer mutual exclusion
+sem_t mutex;    // Semaphore for reader count update
+int read_count = 0;
+
+void *reader(void *arg) {
+    int reader_id = *((int *)arg);
+    while (1) {
+        sem_wait(&mutex);
+        read_count++;
+        if (read_count == 1) {
+            sem_wait(&rw_mutex); // First reader locks the writer
+        }
+        sem_post(&mutex);
+
+        printf("Reader %d is reading\n", reader_id);
+        sleep(rand() % 3);
+
+        sem_wait(&mutex);
+        read_count--;
+        if (read_count == 0) {
+            sem_post(&rw_mutex); // Last reader unlocks the writer
+        }
+        sem_post(&mutex);
+
+        sleep(rand() % 3);
+    }
+}
+
+void *writer(void *arg) {
+    int writer_id = *((int *)arg);
+    while (1) {
+        sem_wait(&rw_mutex);
+        printf("Writer %d is writing\n", writer_id);
+        sleep(rand() % 3);
+        sem_post(&rw_mutex);
+        sleep(rand() % 3);
+    }
+}
+
+int main() {
+    pthread_t readers[5], writers[5];
+    int reader_ids[5], writer_ids[5];
+
+    sem_init(&rw_mutex, 0, 1);
+    sem_init(&mutex, 0, 1);
+
+    for (int i = 0; i < 5; i++) {
+        reader_ids[i] = i + 1;
+        writer_ids[i] = i + 1;
+        pthread_create(&readers[i], NULL, reader, &reader_ids[i]);
+        pthread_create(&writers[i], NULL, writer, &writer_ids[i]);
+    }
+
+    for (int i = 0; i < 5; i++) {
+        pthread_join(readers[i], NULL);
+        pthread_join(writers[i], NULL);
+    }
+
+    sem_destroy(&rw_mutex);
+    sem_destroy(&mutex);
+
+    return 0;
+}
