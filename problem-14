@@ -1,0 +1,57 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <dirent.h>
+#include <string.h>
+
+void listFiles(const char *path) {
+    struct dirent *entry;
+    DIR *dp = opendir(path);
+
+    if (dp == NULL) {
+        perror("opendir");
+        return;
+    }
+
+    printf("Files in directory '%s':\n", path);
+    while ((entry = readdir(dp))) {
+        printf("%s\n", entry->d_name);
+    }
+
+    closedir(dp);
+}
+
+void organizeFiles(const char *path) {
+    struct dirent *entry;
+    DIR *dp = opendir(path);
+
+    if (dp == NULL) {
+        perror("opendir");
+        return;
+    }
+
+    while ((entry = readdir(dp))) {
+        if (entry->d_type == DT_REG) { // Regular file
+            char newPath[1024];
+            snprintf(newPath, sizeof(newPath), "%s/%s", path, entry->d_name);
+            printf("Organizing file: %s\n", newPath);
+            // Here you can perform any file organization operations like moving, renaming, etc.
+        }
+    }
+
+    closedir(dp);
+}
+
+int main() {
+    const char *directoryPath = "."; // Current directory
+
+    // List files before organizing
+    listFiles(directoryPath);
+
+    // Organize files
+    organizeFiles(directoryPath);
+
+    // List files after organizing
+    listFiles(directoryPath);
+
+    return 0;
+}
