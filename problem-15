@@ -1,0 +1,60 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <dirent.h>
+#include <sys/stat.h>
+#include <string.h>
+
+void createDirectory(const char *path) {
+    if (mkdir(path, 0755) == -1) {
+        perror("mkdir");
+    } else {
+        printf("Directory created: %s\n", path);
+    }
+}
+
+void organizeFiles(const char *sourceDir, const char *userDir) {
+    struct dirent *entry;
+    DIR *dp = opendir(sourceDir);
+    if (dp == NULL) {
+        perror("opendir");
+        return;
+    }
+
+    while ((entry = readdir(dp))) {
+        if (entry->d_type == DT_REG) { // Regular file
+            char newPath[1024], oldPath[1024];
+            snprintf(oldPath, sizeof(oldPath), "%s/%s", sourceDir, entry->d_name);
+            snprintf(newPath, sizeof(newPath), "%s/%s", userDir, entry->d_name);
+            if (rename(oldPath, newPath) == -1) {
+                perror("rename");
+            } else {
+                printf("Moved file %s to %s\n", oldPath, newPath);
+            }
+        }
+    }
+
+    closedir(dp);
+}
+
+int main() {
+    const char *masterDir = "master_directory";
+    const char *users[] = {"user1", "user2", "user3"};
+    const int numUsers = sizeof(users) / sizeof(users[0]);
+
+    // Create master directory
+    createDirectory(masterDir);
+
+    // Create user directories and organize files
+    for (int i = 0; i < numUsers; ++i) {
+        char userDir[1024];
+        snprintf(userDir, sizeof(userDir), "%s/%s", masterDir, users[i]);
+        createDirectory(userDir);
+
+        // Here we organize files for each user. For simplicity, we use the same source directory.
+        // In a real scenario, you would have separate source directories for each user.
+        const char *sourceDir = "."; // Current directory
+        organizeFiles(sourceDir, userDir);
+    }
+
+    return 0;
+}
