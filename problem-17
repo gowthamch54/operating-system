@@ -1,0 +1,130 @@
+#include <stdio.h>
+#include <stdbool.h>
+
+#define MAX_PROCESSES 5
+#define MAX_RESOURCES 3
+
+int available[MAX_RESOURCES];
+int max[MAX_PROCESSES][MAX_RESOURCES];
+int allocation[MAX_PROCESSES][MAX_RESOURCES];
+int need[MAX_PROCESSES][MAX_RESOURCES];
+
+bool isSafeState(int processes, int resources) {
+    bool finish[MAX_PROCESSES] = {0};
+    int work[MAX_RESOURCES];
+    for (int i = 0; i < resources; i++) {
+        work[i] = available[i];
+    }
+
+    while (true) {
+        bool found = false;
+        for (int p = 0; p < processes; p++) {
+            if (!finish[p]) {
+                bool canAllocate = true;
+                for (int r = 0; r < resources; r++) {
+                    if (need[p][r] > work[r]) {
+                        canAllocate = false;
+                        break;
+                    }
+                }
+                if (canAllocate) {
+                    for (int r = 0; r < resources; r++) {
+                        work[r] += allocation[p][r];
+                    }
+                    finish[p] = true;
+                    found = true;
+                }
+            }
+        }
+        if (!found) {
+            break;
+        }
+    }
+
+    for (int p = 0; p < processes; p++) {
+        if (!finish[p]) {
+            return false;
+        }
+    }
+    return true;
+}
+
+void requestResources(int p, int resources) {
+    printf("Enter the request for process %d:\n", p);
+    int request[MAX_RESOURCES];
+    for (int i = 0; i < resources; i++) {
+        scanf("%d", &request[i]);
+    }
+
+    bool validRequest = true;
+    for (int i = 0; i < resources; i++) {
+        if (request[i] > need[p][i]) {
+            validRequest = false;
+            break;
+        }
+    }
+
+    if (validRequest) {
+        for (int i = 0; i < resources; i++) {
+            if (request[i] > available[i]) {
+                validRequest = false;
+                break;
+            }
+        }
+    }
+
+    if (validRequest) {
+        for (int i = 0; i < resources; i++) {
+            available[i] -= request[i];
+            allocation[p][i] += request[i];
+            need[p][i] -= request[i];
+        }
+
+        if (isSafeState(MAX_PROCESSES, resources)) {
+            printf("Request can be granted.\n");
+        } else {
+            for (int i = 0; i < resources; i++) {
+                available[i] += request[i];
+                allocation[p][i] -= request[i];
+                need[p][i] += request[i];
+            }
+            printf("Request cannot be granted as it leads to unsafe state.\n");
+        }
+    } else {
+        printf("Request cannot be granted.\n");
+    }
+}
+
+int main() {
+    int processes = MAX_PROCESSES;
+    int resources = MAX_RESOURCES;
+
+    printf("Enter the available resources:\n");
+    for (int i = 0; i < resources; i++) {
+        scanf("%d", &available[i]);
+    }
+
+    printf("Enter the maximum resource matrix:\n");
+    for (int p = 0; p < processes; p++) {
+        for (int r = 0; r < resources; r++) {
+            scanf("%d", &max[p][r]);
+            need[p][r] = max[p][r];
+        }
+    }
+
+    printf("Enter the allocation matrix:\n");
+    for (int p = 0; p < processes; p++) {
+        for (int r = 0; r < resources; r++) {
+            scanf("%d", &allocation[p][r]);
+            need[p][r] -= allocation[p][r];
+        }
+    }
+
+    int processNumber;
+    printf("Enter the process number to make a request: ");
+    scanf("%d", &processNumber);
+
+    requestResources(processNumber, resources);
+
+    return 0;
+}
