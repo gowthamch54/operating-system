@@ -1,0 +1,72 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <pthread.h>
+#include <semaphore.h>
+#include <unistd.h>
+
+#define BUFFER_SIZE 5
+
+int buffer[BUFFER_SIZE];
+int in = 0, out = 0;
+
+sem_t empty, full;
+pthread_mutex_t mutex;
+
+void *producer(void *param) {
+    int item;
+    while (1) {
+        item = rand() % 100; // Produce a random item
+        sem_wait(&empty); // Wait if buffer is full
+        pthread_mutex_lock(&mutex); // Lock the buffer
+
+        buffer[in] = item;
+        printf("Produced: %d\n", item);
+        in = (in + 1) % BUFFER_SIZE;
+
+        pthread_mutex_unlock(&mutex); // Unlock the buffer
+        sem_post(&full); // Signal that buffer is not empty
+
+        sleep(1); // Simulate production time
+    }
+}
+
+void *consumer(void *param) {
+    int item;
+    while (1) {
+        sem_wait(&full); // Wait if buffer is empty
+        pthread_mutex_lock(&mutex); // Lock the buffer
+
+        item = buffer[out];
+        printf("Consumed: %d\n", item);
+        out = (out + 1) % BUFFER_SIZE;
+
+        pthread_mutex_unlock(&mutex); // Unlock the buffer
+        sem_post(&empty); // Signal that buffer is not full
+
+        sleep(1); // Simulate consumption time
+    }
+}
+
+int main() {
+    pthread_t tid1, tid2;
+
+    // Initialize the semaphore and mutex
+    sem_init(&empty, 0, BUFFER_SIZE);
+    sem_init(&full, 0, 0);
+    pthread_mutex_init(&mutex, NULL);
+
+    // Create producer and consumer threads
+    pthread_create(&tid1, NULL, producer, NULL);
+    pthread_create(&tid2, NULL, consumer, NULL);
+
+    // Wait for the threads to finish (they won't in this infinite loop example)
+    pthread_join(tid1, NULL);
+    pthread_join(tid2, NULL);
+
+    // Destroy the semaphore and mutex
+    sem_destroy(&empty);
+    sem_destroy(&full);
+    pthread_mutex_destroy(&mutex);
+
+    return 0;
+}
