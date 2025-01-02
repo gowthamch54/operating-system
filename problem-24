@@ -1,0 +1,61 @@
+#include <stdio.h>
+#include <fcntl.h>
+#include <unistd.h>
+#include <string.h>
+#include <stdlib.h>
+
+#define BUFFER_SIZE 1024
+
+void writeFile(const char *fileName, const char *content) {
+    int fd = open(fileName, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+    if (fd == -1) {
+        perror("Error opening file");
+        exit(1);
+    }
+    write(fd, content, strlen(content));
+    close(fd);
+}
+
+void readFile(const char *fileName) {
+    int fd = open(fileName, O_RDONLY);
+    if (fd == -1) {
+        perror("Error opening file");
+        exit(1);
+    }
+
+    char buffer[BUFFER_SIZE];
+    ssize_t bytesRead;
+    while ((bytesRead = read(fd, buffer, BUFFER_SIZE)) > 0) {
+        write(STDOUT_FILENO, buffer, bytesRead);
+    }
+    close(fd);
+}
+
+void copyFile(const char *source, const char *destination) {
+    int src_fd = open(source, O_RDONLY);
+    if (src_fd == -1) {
+        perror("Error opening source file");
+        exit(1);
+    }
+
+    int dest_fd = open(destination, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+    if (dest_fd == -1) {
+        perror("Error opening destination file");
+        close(src_fd);
+        exit(1);
+    }
+
+    char buffer[BUFFER_SIZE];
+    ssize_t bytesRead, bytesWritten;
+
+    while ((bytesRead = read(src_fd, buffer, BUFFER_SIZE)) > 0) {
+        bytesWritten = write(dest_fd, buffer, bytesRead);
+        if (bytesWritten != bytesRead) {
+            perror("Error writing to destination file");
+            close(src_fd);
+            close(dest_fd);
+            exit(1);
+        }
+    }
+
+    if (bytesRead == -[_{{{CITATION{{{_1{](https://github.com/vedant-jain/OSLab/tree/aee93450951fd1ecf3ad728b96cc21a8b98c8d32/lab10%2Ffirst_fit.c)[_{{{CITATION{{{_2{](https://github.com/sudiptog81/os-lab/tree/2449644f49e18565ff0dcf9234ff6d19fab81fe3/allocationStrategies%2FfirstFit.cpp)[_{{{CITATION{{{_3{](https://github.com/poseidon-code/cpp-codes/tree/c676773dc59aeccf7cef74d875f30ee70a0d09fa/worst-fit%20memory%20allocation.cpp)[_{{{CITATION{{{_4{](https://github.com/mrsac7/CSO-231N-Operating-Systems-Lab/tree/2c6fb382ff3aa96bd49c38d41a9eb9249cfd032b/first-fit.c)[_{{{CITATION{{{_5{](https://github.com/guhan29/OsCase/tree/73dd35d33e50c64d9c99eed325f56c3b50e4ee82/nextfit.c)[_{{{CITATION{{{_6{](https://github.com/sparshjain1622/OS/tree/d416a38ec1c113027dc5ce227529a3abf6f1d69f/worstfit%20allocation.cpp)[_{{{CITATION{{{_7{](https://github.com/sudiptog81/os-lab/tree/2449644f49e18565ff0dcf9234ff6d19fab81fe3/allocationStrategies%2FbestFit.cpp)[_{{{CITATION{{{_8{](https://github.com/Shohan-Pramanik/Operating-System-Lab/tree/df290964090113e4c063ed9435d402ad03efa8ac/Best_Fit.cpp)[_{{{CITATION{{{_9{](https://github.com/Ratna04priya/Disposal-Codes/tree/2c7196c7bf254b81f6848c36d143dfb8787b1b66/op_lab%2Foperating%20system%2Ffirstfit%2FFirstfit.java)[_{{{CITATION{{{_10{](https://github.com/deba19/OS_Project/tree/32d520b1b752b65718ca1519e44df11eb58a94e0/FirstFit_BestFit_WorstFit.c)[_{{{CITATION{{{_11{](https://github.com/Ratna04priya/Disposal-Codes/tree/2c7196c7bf254b81f6848c36d143dfb8787b1b66/op_lab%2Ffit%2Ffirst_fit.cpp)[_{{{CITATION{{{_12{](https://github.com/namanwalia11/OS_Program/tree/7eff4908cffdd901eb6aa3da9eb9103825f49f11/BestFit.c)
